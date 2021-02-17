@@ -6,6 +6,8 @@ public class Rocket : MonoBehaviour
 {
     Rigidbody rigidBody;
     AudioSource audioSource;
+    [SerializeField]float RcsThrust = 100f;
+    [SerializeField]float MainThrust = 50f;
     // Start is called before the first frame update
     void Start()
     {
@@ -16,14 +18,31 @@ public class Rocket : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ProcessInput();
+        Thrust();
+        Rotate();
     }
 
-    void ProcessInput()
+    void Rotate()
+    {
+        float RotationThisFrame = RcsThrust * Time.deltaTime;
+        rigidBody.freezeRotation = true;
+        if (Input.GetKey(KeyCode.A))
+        {
+            transform.Rotate(Vector3.forward * RotationThisFrame);
+        }
+        if (Input.GetKey(KeyCode.D))
+        {
+            transform.Rotate(-Vector3.forward * RotationThisFrame);
+        }
+        rigidBody.freezeRotation = false;
+    }
+
+    private void Thrust()
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            rigidBody.AddRelativeForce(Vector3.up);
+            float ThrustThisFrame = MainThrust;
+            rigidBody.AddRelativeForce(Vector3.up * ThrustThisFrame);
             if (!audioSource.isPlaying)
             {
                 audioSource.Play();
@@ -33,14 +52,6 @@ public class Rocket : MonoBehaviour
         else
         {
             audioSource.Stop();
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            transform.Rotate(Vector3.forward);
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            transform.Rotate(-Vector3.forward);
         }
     }
 }
